@@ -10,7 +10,7 @@ TODO: simplify isoform structure rendering?
  */
 
 import {curveCardinal, line} from "d3-shape";
-import {max, sum} from "d3-array";
+import {max, sum, range} from "d3-array";
 import {scaleLinear} from "d3-scale";
 
 export default class GeneModel {
@@ -270,6 +270,53 @@ export default class GeneModel {
             .style("fill", "#eee")
             .style("cursor", "default");
 
+
+        /***** rendering arrows to show strandedness */
+        let chevronWidth = 5; // width of chevron symbol
+        let chevronSpace = 20; // space in between two chevrons
+        let chevronDist = 5; // min distance from chevron to exon
+        
+        let genomic = this.gene.strand == "+";
+
+        let currExon = genomic ? 0 : this.exonsCurated.length-1;
+        let currExonX1 = this.exonsCurated[currExon].x;
+        let currExonX2 = currExonX1 + this.exonsCurated[currExon].w;
+
+        for (let i of range(0, config.w, (chevronWidth+chevronSpace))) {
+            // check arrow is inside transcript
+            if (
+                (genomic && (
+                    i < this.exonsCurated[0].x + this.exonsCurated[0].w + chevronDist ||
+                    i > this.exonsCurated[this.exonsCurated.length-1].x - chevronDist - chevronWidth
+                )) ||
+                (!genomic && (
+                    i < this.exonsCurated[this.exonsCurated.length-1].x + this.exonsCurated[this.exonsCurated.length-1].w + chevronDist ||
+                    i > this.exonsCurated[0].x - chevronDist - chevronWidth
+                ))
+            ) {
+                continue;
+            }
+            // advance the current exon if needed
+            while (
+                i > currExonX2 + chevronDist && (
+                    (genomic && currExon < this.exonsCurated.length) ||
+                    (!genomic && currExon >= 0)
+                )
+            ) {
+                currExon = genomic ? currExon + 1 : currExon - 1;
+                currExonX1 = this.exonsCurated[currExon].x;
+                currExonX2 = currExonX1 + this.exonsCurated[currExon].w;
+            }
+            // check arrow is not inside current exon
+            if (i > currExonX1 - chevronDist - chevronWidth && i < currExonX2 + chevronDist) {
+                continue;
+            }
+            // arrow should be displayed, append to dom
+            dom.append("use")
+            .attr("xlink:href", genomic ? "#chevron-right" : "#chevron-left")
+            .attr("x", i)
+            .attr("y", exonY);
+        }
 
         /***** rendering text labels */
         if (config.labelOn == 'left' || config.labelOn == 'both'){
