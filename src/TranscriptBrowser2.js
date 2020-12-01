@@ -25,7 +25,7 @@ import BubbleMap from "./modules/BubbleMap";
 import HalfMap from "./modules/HalfMap";
 
 export function getMongoData(geneName, track){
-    return json('http://localhost:5000/gene?geneId=' + geneName + '&track=' + track)
+    return json('https://gandallab.connor.jp/gene?geneId=' + geneName + '&track=' + track)
 }
 
 export function transcriptBubbles(par){
