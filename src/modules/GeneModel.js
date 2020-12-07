@@ -326,6 +326,7 @@ export default class GeneModel {
             .attr("x", this.xScale.range()[0] - 5)
             .attr("y", exonY + 7.5)
             .style("font-size", "9px")
+            .style("fill", this.gene.transcriptId.split('_')[0] == 'gencode' ? "green" : "black")
             .text(this.gene.transcriptId===undefined?`${this.gene.geneSymbol}`:this.gene.transcriptId);
 
 

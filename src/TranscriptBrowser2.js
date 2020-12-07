@@ -38,8 +38,8 @@ export function transcriptBubbles(par){
         transcripts[i].enum = i;
     }
     let annotations = transcripts.filter(tx => tx.hasOwnProperty('expression') && tx.expression.length);
-    console.log(transcripts)
-    console.log(annotations);
+    //console.log(transcripts)
+    //console.log(annotations);
     if (annotations.length == 0) {
         return;
     }
